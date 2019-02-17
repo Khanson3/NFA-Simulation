@@ -31,9 +31,12 @@ public class Main {
 		
 		ArrayList<State> endStates = traverse(new ArrayList<State>(), nfa.getStartState(), input);
 		
-		for(State elem:endStates) {
-			System.out.println(elem.getName());
-		}
+		endStates = removeDuplicates(endStates);
+		
+		if(hasAcceptState(endStates))
+			printAccept(endStates);
+		else
+			printReject(endStates);
 	}
 
 	public static void executeStateLine(String line) {
@@ -93,8 +96,51 @@ public class Main {
 		
 		for(String[] elem:transitions) {
 			if(elem[0].equals(symbol))
-				return traverse(endStates, nfa.findState(elem[1]), input.substring(1, input.length()));
+				endStates.addAll(traverse(endStates, nfa.findState(elem[1]), input.substring(1, input.length())));
 		}
-		return null;
+		return endStates;
+	}
+	
+	public static ArrayList<State> removeDuplicates(ArrayList<State> endStates) {
+		ArrayList<State> ret = new ArrayList<>();
+		
+		for(State elem:endStates) {
+			if(!ret.contains(elem))
+				ret.add(elem);
+		}
+		return ret;
+	}
+	
+	public static boolean hasAcceptState(ArrayList<State> endStates) {
+		for(State elem:endStates) {
+			if(elem.isAccept())
+				return true;
+		}
+		return false;
+	}
+	
+	public static void printAccept(ArrayList<State> endStates) {
+		ArrayList<State> acceptStates = new ArrayList<>();
+		
+		for(State elem:endStates) {
+			if(elem.isAccept())
+				acceptStates.add(elem);
+		}
+		
+		System.out.print("accept ");
+		
+		for(State elem:acceptStates) {
+			System.out.print(elem.getName() + " ");
+		}
+		System.out.println();
+	}
+	
+	public static void printReject(ArrayList<State> endStates) {
+		System.out.print("reject ");
+		
+		for(State elem:endStates) {
+			System.out.print(elem.getName() + " ");
+		}
+		System.out.println();
 	}
 }
